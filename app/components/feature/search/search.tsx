@@ -1,4 +1,4 @@
-import { Form, useLocation } from "react-router";
+import { Form, useLocation, useNavigation } from "react-router";
 import { SearchPagination } from "./search-pagination";
 import { SearchResult } from "./search-result";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function Search() {
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const q = searchParams.get("q") ?? "";
@@ -20,7 +23,7 @@ export function Search() {
         <input type="hidden" name="page" value="0" />
         <Button>Search</Button>
       </Form>
-      <SearchResult />
+      {isNavigating ? "loading..." : <SearchResult />}
       <SearchPagination />
     </>
   );
