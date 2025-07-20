@@ -1,5 +1,6 @@
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
@@ -9,6 +10,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { ThemeProvider } from "./context/theme";
+import { ThemeToggle } from "./components/feature/theme/theme-toggle";
+import { H1 } from "./components/ui/typography";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -30,11 +34,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function HydrateFallback() {
-  return "loading...";
+  return (
+    <div className="flex h-screen justify-center items-center">loading...</div>
+  );
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="theme">
+      <header className="p-8 max-w-[80ch] m-auto">
+        <div className="flex justify-end">
+          <ThemeToggle />
+        </div>
+        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+          News Search
+        </h1>
+      </header>
+      <main className="p-8 max-w-[80ch] m-auto space-y-4">
+        <Outlet />
+      </main>
+    </ThemeProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
@@ -49,13 +69,26 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         ? "The requested page could not be found."
         : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
+    details = error.message.startsWith("Rate limit quota violation")
+      ? "There were too many searches. Please wait a bit and try again."
+      : error.message;
+    stack = error.message.startsWith("Rate limit quota violation")
+      ? undefined
+      : error.stack;
+  }
+
+  const isOverlimit = details.startsWith("Rate limit quota violation");
+  if (isOverlimit) {
+    details = "There were too many searches. Please wait a bit and try again.";
+    stack = undefined;
   }
 
   return (
     <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
+      <Link to="/" className="underline">
+        Home
+      </Link>
+      <H1 className="py-4">{message}</H1>
       <p>{details}</p>
       {stack && (
         <pre className="w-full p-4 overflow-x-auto">
