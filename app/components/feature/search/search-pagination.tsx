@@ -1,18 +1,17 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
+import { useSearchArticles } from "@/api/article";
 
-interface PaginationProps {
-  hits: number;
-  offset: number;
-  currentPageIndex: number;
-  q: string;
-}
-export function SearchPagination({
-  q,
-  hits,
-  offset,
-  currentPageIndex,
-}: PaginationProps) {
+export function SearchPagination() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const q = searchParams.get("q") ?? "";
+  const currentPageIndex = parseInt(searchParams.get("page") ?? "0");
+
+  const { data } = useSearchArticles(location.search);
+  const hits = data?.hits ?? 0;
+  const offset = data?.offset ?? 0;
+
   return (
     <div className="flex gap-x-4 items-center">
       {currentPageIndex < 1 || (

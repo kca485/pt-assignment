@@ -1,42 +1,14 @@
-import { Form, useLocation, useNavigation } from "react-router";
+import { Form, useLocation } from "react-router";
 import { SearchPagination } from "./search-pagination";
 import { SearchResult } from "./search-result";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export interface ArticleDTO {
-  _id: string;
-  byline: {
-    original: string;
-  };
-  headline: {
-    main: string;
-  };
-  pub_date: string;
-  web_url: string;
-  snippet: string;
-  source: string;
-}
-
-export interface ArticleList {
-  data: ArticleDTO[];
-  hits: number;
-  offset: number;
-}
-
-interface SearchProps {
-  data: ArticleList;
-}
-
-export function Search({ data }: SearchProps) {
-  const navigation = useNavigation();
-  const isLoading = Boolean(navigation.location);
-
+export function Search() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const q = searchParams.get("q") ?? "";
-  const currentPageIndex = parseInt(searchParams.get("page") ?? "0");
 
   return (
     <>
@@ -48,21 +20,8 @@ export function Search({ data }: SearchProps) {
         <input type="hidden" name="page" value="0" />
         <Button>Search</Button>
       </Form>
-      {isLoading ? (
-        "loading..."
-      ) : (
-        <>
-          <SearchResult data={data.data} />
-          {Boolean(data.data.length) && (
-            <SearchPagination
-              q={q}
-              currentPageIndex={currentPageIndex}
-              hits={data.hits}
-              offset={data.offset}
-            />
-          )}
-        </>
-      )}
+      <SearchResult />
+      <SearchPagination />
     </>
   );
 }

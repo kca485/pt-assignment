@@ -7,12 +7,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
-import type { Route } from "./+types/root";
-import "./app.css";
 import { ThemeProvider } from "./context/theme";
 import { ThemeToggle } from "./components/feature/theme/theme-toggle";
 import { H1 } from "./components/ui/typography";
+import { QueryClientProvider } from "@tanstack/react-query";
+
+import type { Route } from "./+types/root";
+import "./app.css";
+import { queryClient } from "./lib/queryClient";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -41,19 +43,21 @@ export function HydrateFallback() {
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="theme">
-      <header className="p-8 max-w-[80ch] m-auto">
-        <div className="flex justify-end">
-          <ThemeToggle />
-        </div>
-        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-          News Search
-        </h1>
-      </header>
-      <main className="p-8 max-w-[80ch] m-auto space-y-4">
-        <Outlet />
-      </main>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system" storageKey="theme">
+        <header className="p-8 max-w-[80ch] m-auto">
+          <div className="flex justify-end">
+            <ThemeToggle />
+          </div>
+          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+            News Search
+          </h1>
+        </header>
+        <main className="p-8 max-w-[80ch] m-auto space-y-4">
+          <Outlet />
+        </main>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
@@ -75,12 +79,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     stack = error.message.startsWith("Rate limit quota violation")
       ? undefined
       : error.stack;
-  }
-
-  const isOverlimit = details.startsWith("Rate limit quota violation");
-  if (isOverlimit) {
-    details = "There were too many searches. Please wait a bit and try again.";
-    stack = undefined;
   }
 
   return (

@@ -7,16 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { ArticleDTO } from "./search";
 import { Button } from "@/components/ui/button";
+import { useSearchArticles } from "@/api/article";
+import { useLocation } from "react-router";
 
-interface SearchResultProps {
-  data: ArticleDTO[];
-}
-export function SearchResult({ data }: SearchResultProps) {
+export function SearchResult() {
+  const location = useLocation();
+  const { data, isPending } = useSearchArticles(location.search);
+
+  if (isPending) {
+    return "loading...";
+  }
+
   return (
     <ul className="flex flex-col gap-y-4">
-      {data.map((item) => (
+      {(data?.data ?? []).map((item) => (
         <li key={item._id}>
           <Card>
             <CardHeader>

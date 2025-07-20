@@ -3,6 +3,7 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 import { globalIgnores } from "eslint/config";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 
 export default tseslint.config([
   globalIgnores(["build", ".react-router"]),
@@ -18,4 +19,5 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  ...pluginQuery.configs["flat/recommended"],
 ]);
